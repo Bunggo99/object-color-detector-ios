@@ -1,4 +1,3 @@
-
 import SwiftUI
 import CoreImage
 
@@ -15,56 +14,138 @@ struct ImageView: View {
     @State private var rectSize: CGSize = .zero
     @State private var startedDragging = false
     
+    @State private var showToast = false
+    @State private var toastShown = false
+    @State private var colorValueTypeIdx = 1
+    
     var body: some View {
         ZStack {
-            Color(.systemGray).ignoresSafeArea()
+            Color(UIColor(red: 33/255, green: 33/255, blue: 33/255, alpha: 1))
+                .ignoresSafeArea()
             VStack {
                 if let objColor = objColor {
-                    HStack {
-                        Circle()
-                            .foregroundColor(Color(objColor))
-                            .frame(width: 50, height: 50)
-                        VStack(alignment: .leading) {
-                            Text("Descriptive Color Name: \(objColor.accessibilityName)")
-                            Text("Specific Color Name: \(objColorData!.name)")
-                        }
-                        if loadingColor {
-                            ProgressView()
-                                .padding(.leading, 4)
-                        }
-                    }
-                    .frame(maxWidth: .infinity)
-                    .overlay(alignment: .trailing, content: {
-                        VStack(alignment: .trailing) {
-                            Text("Hex Code: #\(objColor.hexString)")
-                            HStack {
-                                Text("R: \(objColor.rgbValues.red), ")
-                                Text("G: \(objColor.rgbValues.green), ")
-                                Text("B: \(objColor.rgbValues.blue)")
-                            }
-                        }.padding(.trailing, 32)
-                    })
+                    DisplayColorState(objColor: objColor)
                 }
                 else {
-                    HStack {
-                        Circle()
-                            .stroke()
-                            .frame(width: 50, height: 50)
-                        Text("Drag an area on the image to detect the color")
-                        if loadingColor {
-                            ProgressView()
-                                .padding(.leading, 4)
-                        }
-                    }
+                    EmptyState()
                 }
                 if let image = selectedImage {
                     ImageComponent(image)
+                        .overlay(VStack {
+                            if showToast {
+                                Spacer()
+                                Toast()
+                            }
+                        })
                 }
             }
+            .foregroundColor(Color.teal)
         }
-        .onDisappear(perform: {
+        .onDisappear {
             selectedImage = nil
+        }
+    }
+    
+    func DisplayColorState(objColor: UIColor) -> some View {
+        HStack {
+            Circle()
+                .foregroundColor(Color(objColor))
+                .frame(width: 50, height: 50)
+                .padding(.trailing, 4)
+            VStack(alignment: .leading) {
+                Text("Color: \(objColor.accessibilityName.capitalized)")
+                    .font(.title2)
+                //Text("Specific Color Name: \(objColorData!.name)")
+            }
+            .textSelection(.enabled)
+            if loadingColor {
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: Color.white))
+                    .padding(.leading, 4)
+            }
+        }
+        .frame(maxWidth: .infinity)
+        
+        .overlay(alignment: .trailing, content: {
+            HStack(alignment: .top) {
+                VStack(alignment: .trailing) {
+                    if colorValueTypeIdx == 1 {
+                        ValueText(text: "Hex Code: ", value: "#\(objColor.hexString)", brackets: false)
+                    }
+                    else if colorValueTypeIdx == 2 {
+                        ValueText(text: "RGB: ", value: String(
+                            format: "%d, %d, %d", 
+                            objColor.rgbValues.red, objColor.rgbValues.green, objColor.rgbValues.blue))
+                    }
+                    else if colorValueTypeIdx == 3 {
+                        ValueText(text: "HSV: ", value: String(
+                            format: "%d, %d, %d", 
+                            objColor.hsvValues.hue, objColor.hsvValues.saturation, objColor.hsvValues.value))
+                    }
+                    else if colorValueTypeIdx == 4 {
+                        ValueText(text: "CMYK: ", value: String(
+                            format: "%d, %d, %d, %d", 
+                            objColor.cmykValues.cyan, objColor.cmykValues.magenta, 
+                            objColor.cmykValues.yellow, objColor.cmykValues.black))
+                    }
+                }
+                Button(action: {
+                    colorValueTypeIdx += 1
+                    if colorValueTypeIdx > 4 {
+                        colorValueTypeIdx = 1
+                    }
+                }, label: {
+                    Image(systemName: "arrow.right.arrow.left.circle")
+                })
+            }
+            .font(.title2)
+            .padding(.trailing, 32)
         })
+    }
+    
+    func EmptyState() -> some View {
+        HStack {
+            Circle()
+                .stroke()
+                .frame(width: 50, height: 50)
+                .padding(.trailing, 4)
+            Text("Drag an area on the image to detect the color")
+                .font(.title2)
+            if loadingColor {
+                ProgressView()
+                    .progressViewStyle(CircularProgressViewStyle(tint: Color.white))
+                    .padding(.leading, 4)
+            }
+        }
+    }
+    
+    func ValueText(text: String, value: String, brackets: Bool = true) -> some View {
+        Text(text + (brackets ? "(" : "") + value +  (brackets ? ")" : ""))
+            .onTapGesture {
+                UIPasteboard.general.string = value
+                if !toastShown {
+                    showToast = true
+                }
+            }
+    }
+    
+    func Toast() -> some View {
+        Text("Copied to clipboard!")
+            .transition(AnyTransition.opacity.animation(.easeIn(duration: 0.2)))
+            .foregroundColor(Color(uiColor: UIColor(red: 51/255, green: 51/255, blue: 51/255, alpha: 1.0)))
+            .padding()
+            .background(Color(uiColor: UIColor(red: 255/255, green: 204/255, blue: 153/255, alpha: 1.0)))
+            .cornerRadius(10)
+            .onAppear {
+                toastShown = true
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                    showToast = false
+                }
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.3) {
+                    toastShown = false
+                }
+            }
+            .padding(.bottom, 32)
     }
     
     func ImageComponent(_ image: UIImage) -> some View {
@@ -86,7 +167,7 @@ struct ImageView: View {
                     
                     rectSize = CGSize(width: endPosition.x - startPosition.x, height: endPosition.y - startPosition.y)
                 }.onEnded { value in
-                    DetectColor(image: image)
+                    detectColor(image: image)
                 }
             ).overlay { 
                 Rectangle()
@@ -107,7 +188,7 @@ struct ImageView: View {
         }
     }
     
-    func DetectColor(image: UIImage)
+    func detectColor(image: UIImage)
     {
         startedDragging = false
         
@@ -187,6 +268,21 @@ extension UIColor {
     }
     var rgbValues: (red: Int, green: Int, blue: Int) {
         return ColorHelpers.hexToRGB(hex: self.hexString)!
+    }
+    var hsvValues: (hue: Int, saturation: Int, value: Int) {
+        var hue: CGFloat = 0, saturation: CGFloat = 0, brightness: CGFloat = 0, alpha: CGFloat = 0
+        self.getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha)
+        return (Int(hue * 360), Int(saturation * 100), Int(brightness * 100))
+    }
+    
+    var cmykValues: (cyan: Int, magenta: Int, yellow: Int, black: Int) {
+        var red: CGFloat = 0, green: CGFloat = 0, blue: CGFloat = 0, alpha: CGFloat = 0
+        self.getRed(&red, green: &green, blue: &blue, alpha: &alpha)
+        let c = 1.0 - red
+        let m = 1.0 - green
+        let y = 1.0 - blue
+        let k = min(c, min(m, y))
+        return (Int(c * 100), Int(m * 100), Int(y * 100), Int(k * 100))
     }
 }
 extension UIImage {
