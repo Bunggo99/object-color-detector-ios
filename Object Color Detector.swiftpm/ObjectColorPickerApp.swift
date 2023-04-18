@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct MyApp: App {
+struct ObjectColorPickerApp: App {
     var body: some Scene {
         WindowGroup {
             CameraView()
