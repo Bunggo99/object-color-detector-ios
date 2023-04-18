@@ -20,6 +20,7 @@ struct ColorDisplayView: View {
                  "Drag an area on the image to detect the color" :
                  "Color: \(objColor!.accessibilityName.capitalized)")
                 .font(.title2)
+                .textSelection(.enabled)
             if loadingColorData {
                 LoadingView()
             }
