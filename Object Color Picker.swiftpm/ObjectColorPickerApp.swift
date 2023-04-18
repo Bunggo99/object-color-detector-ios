@@ -4,7 +4,9 @@ import SwiftUI
 struct ObjectColorPickerApp: App {
     var body: some Scene {
         WindowGroup {
-            CameraView()
+            NavigationStack {
+                CameraView()
+            }
         }
     }
 }

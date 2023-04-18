@@ -5,27 +5,26 @@ struct ColorValuesDisplayView: View {
     let toastShown: Bool
     @Binding var showToast: Bool
     
-    @State private var colorValueTypeIdx = 1    
-    @State private var selectedColorRepresentation = "Hex Code"
-    let colorRepresentations = ["Hex Code", "RGB", "HSV", "CMYK"]
+    @State private var colorValueTypeIdx = 0
+    let colorTypes = ["Hex Code", "RGB", "HSV", "CMYK"]
     
     var body: some View {
         HStack(alignment: .center) {
             VStack(alignment: .trailing) {
-                if colorValueTypeIdx == 1 {
+                if colorValueTypeIdx == 0 {
                     ValueText(text: "Hex Code: ", value: "#\(objColor.hexString)", brackets: false)
                 }
-                else if colorValueTypeIdx == 2 {
+                else if colorValueTypeIdx == 1 {
                     ValueText(text: "RGB: ", value: String(
                         format: "%d, %d, %d", 
                         objColor.rgbValues.red, objColor.rgbValues.green, objColor.rgbValues.blue))
                 }
-                else if colorValueTypeIdx == 3 {
+                else if colorValueTypeIdx == 2 {
                     ValueText(text: "HSV: ", value: String(
                         format: "%d, %d, %d", 
                         objColor.hsvValues.hue, objColor.hsvValues.saturation, objColor.hsvValues.value))
                 }
-                else if colorValueTypeIdx == 4 {
+                else if colorValueTypeIdx == 3 {
                     ValueText(text: "CMYK: ", value: String(
                         format: "%d, %d, %d, %d", 
                         objColor.cmykValues.cyan, objColor.cmykValues.magenta, 
@@ -34,12 +33,11 @@ struct ColorValuesDisplayView: View {
             }
             
             Menu {
-                ForEach(colorRepresentations, id: \.self) { representation in
+                ForEach(0..<4, id: \.self) { idx in
                     Button(action: {
-                        selectedColorRepresentation = representation
-                        updateColorValue()
+                        colorValueTypeIdx = idx
                     }) {
-                        Text(representation)
+                        Text(colorTypes[idx])
                     }
                 }
             } label: {
@@ -47,33 +45,9 @@ struct ColorValuesDisplayView: View {
                     .font(.title)
             }
             .menuStyle(DefaultMenuStyle())
-            .onAppear(perform: {
-                updateColorValue()
-            })
-            //            Button(action: {
-            //                colorValueTypeIdx += 1
-            //                if colorValueTypeIdx > 4 {
-            //                    colorValueTypeIdx = 1
-            //                }
-            //            }, label: {
-            //                Image(systemName: "arrow.right.arrow.left.circle")
-            //            })
         }
         .font(.title2)
         .padding(.trailing, 32)
-    }
-    
-    func updateColorValue() {
-        switch selectedColorRepresentation {
-        case "RGB":
-            colorValueTypeIdx = 2
-        case "HSV":
-            colorValueTypeIdx = 3
-        case "CMYK":
-            colorValueTypeIdx = 4
-        default:
-            colorValueTypeIdx = 1
-        }
     }
     
     func ValueText(text: String, value: String, brackets: Bool = true) -> some View {
