@@ -8,13 +8,13 @@ import PackageDescription
 import AppleProductTypes
 
 let package = Package(
-    name: "Object Color Detector",
+    name: "Object Color Picker",
     platforms: [
         .iOS("16.0")
     ],
     products: [
         .iOSApplication(
-            name: "Object Color Detector",
+            name: "Object Color Picker",
             targets: ["AppModule"],
             displayVersion: "1.0",
             bundleVersion: "1",
