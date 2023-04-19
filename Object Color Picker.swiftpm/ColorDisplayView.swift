@@ -21,7 +21,6 @@ struct ColorDisplayView: View {
                  "Color: \(objColor!.accessibilityName.capitalized)")
                 .font(.title2)
                 .textSelection(.enabled)
-                .fontWeight(.light)
             if loadingColorData {
                 LoadingView()
             }
