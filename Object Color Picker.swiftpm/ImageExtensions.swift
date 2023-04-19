@@ -1,7 +1,6 @@
 import SwiftUI
 
 extension UIImage {
-    
     func preciseAverageColor() -> UIColor? {
         let colorSpace = CGColorSpaceCreateDeviceRGB()
         let bytesPerPixel = 4

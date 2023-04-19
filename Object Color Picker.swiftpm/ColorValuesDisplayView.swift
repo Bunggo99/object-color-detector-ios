@@ -65,11 +65,11 @@ struct ColorValuesDisplayView: View {
                     }
                 }
         }
-            .onTapGesture {
-                UIPasteboard.general.string = value
-                if !toastShown {
-                    showToast = true
-                }
+        .onTapGesture {
+            UIPasteboard.general.string = value
+            if !toastShown {
+                showToast = true
             }
+        }
     }
 }

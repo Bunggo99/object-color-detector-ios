@@ -17,10 +17,11 @@ struct ColorDisplayView: View {
                 .frame(width: 50, height: 50)
                 .padding(.trailing, 4)
             Text(emptyState ? 
-                 "Drag an area on the image to detect the color" :
+                 "Drag on an area to detect the color" :
                  "Color: \(objColor!.accessibilityName.capitalized)")
                 .font(.title2)
                 .textSelection(.enabled)
+                .fontWeight(.light)
             if loadingColorData {
                 LoadingView()
             }

@@ -5,7 +5,7 @@ struct ObjectColorPickerApp: App {
     var body: some Scene {
         WindowGroup {
             NavigationStack {
-                CameraView()
+                IntroPageView(intros: intros, pageIndex: 0)
             }
         }
     }

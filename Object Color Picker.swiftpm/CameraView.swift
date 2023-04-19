@@ -29,7 +29,7 @@ struct CameraView: View {
                     }
             }
             .background(.black)
-            .navigationBarHidden(true)
+//            .navigationBarHidden(true)
             .ignoresSafeArea()
             .statusBar(hidden: true)
             .task {
