@@ -19,6 +19,7 @@ struct ImageView: View {
                                  loadingColorData: loadingColorData, 
                                  toastShown: toastShown, showToast: $showToast, 
                                  objColor: $objColor)
+                .padding(.bottom)
                 if selectedImage != nil {
                     ImageDisplayView(image: $selectedImage, 
                                      objColor: $objColor, 

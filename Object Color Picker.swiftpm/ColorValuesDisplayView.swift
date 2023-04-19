@@ -10,7 +10,7 @@ struct ColorValuesDisplayView: View {
     
     var body: some View {
         HStack(alignment: .center) {
-            VStack(alignment: .trailing) {
+            VStack(alignment: .center) {
                 if colorValueTypeIdx == 0 {
                     ValueText(text: "Hex Code: ", value: "#\(objColor.hexString)", brackets: false)
                 }
@@ -43,17 +43,18 @@ struct ColorValuesDisplayView: View {
             } label: {
                 Image(systemName: "chevron.down.circle")
                     .font(.title)
+                    .bold()
             }
             .menuStyle(DefaultMenuStyle())
         }
         .font(.title2)
-        .padding(.trailing, 32)
     }
     
     func ValueText(text: String, value: String, brackets: Bool = true) -> some View {
         HStack {
-            Image(systemName: "doc.on.doc")
+            Image(systemName: "doc.on.doc").bold()
             Text(text + (brackets ? "(" : "") + value +  (brackets ? ")" : ""))
+                .bold()
                 .contextMenu {
                     Button(action: {
                         UIPasteboard.general.string = value
